@@ -1,16 +1,24 @@
+import argparse
+
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
 import datetime
-import json    
+import json
+import os
 
-#네이버 쇼핑에서의 골프 카테고리의 상품이름, 상품가격, 상품링크 를 지정한 경로로 data.json으로 반환
-#page_size = 20, 40, 60, 80
+'''
+기능: 
+Input: 
+Output: 
+네이버 쇼핑에서의 골프 카테고리의 상품이름, 상품가격, 상품링크 를 지정한 경로로 data.json으로 반환
+page_size = 20, 40, 60, 80
+'''
+def SearchGolfCategory(page_num, page_size=20, location='./',chromeDir='./' ):
 
-def searchGolfCategory(page_num, page_size=20, location="/Users/kimkyumin/Documents/GitHub/SWM/data/"):
     for loop in range(1, page_num+1):
         html = "https://search.shopping.naver.com/search/category/100004232?catId=50000029&origQuery&pagingIndex="+str(loop)+"&pagingSize="+str(page_size)+"&productSet=total&query&sort=rel&timestamp=&viewType=list"
-        driver = webdriver.Chrome('/Users/kimkyumin/Downloads/chromedriver')
+        driver = webdriver.Chrome(os.path.join(chromeDir, "chromedriver"))
         driver.implicitly_wait(10)
 
         driver.maximize_window()
@@ -62,10 +70,20 @@ def searchGolfCategory(page_num, page_size=20, location="/Users/kimkyumin/Docume
                 json.dump(j, file, indent='\t', ensure_ascii=False)
 
 
+def getArgs():
+    parser = argparse.ArgumentParser(description='Crawling Dir')
+    parser.add_argument("--location", default='./', type=str, required=True)
+    parser.add_argument("--PageCount", default=5, type=int, required=False)
+    parser.add_argument("--PageSize", default=20, type=int, required=False)
+    parser.add_argument("--ChromeDir", default='./', type=str, required=True)
 
+    args = parser.parse_args()
+
+    return args
 
 def main():
-    searchGolfCategory(3, 80)
+    args = getArgs()
+    searchGolfCategory(args.PageCount, args.PageSize, args.location, args.ChromeDir)
 
 if __name__ == '__main__':
     main()
